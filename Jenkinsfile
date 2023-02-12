@@ -57,15 +57,15 @@ pipeline {
             }
         }
         
-        stage('Push image') {
-            withCredentials([usernamePassword( credentialsId: 'docker-hub-credentials', usernameVariable: 'USER', passwordVariable: 'PASSWORD')]) {
-                def registry_url = "registry.hub.docker.com/"
-                bat "docker login -u $USER -p $PASSWORD ${registry_url}"
-                docker.withRegistry("http://${registry_url}", "docker-hub-credentials") {
-                    // Push your image now
-                    bat "docker push imranvisualpath/vproappdock:9"
-                }
+        stage('Deploy Image') {
+          steps{
+            script {
+              docker.withRegistry( '', registryCredential ) {
+                dockerImage.push("$BUILD_NUMBER")
+                dockerImage.push('9')
+              }
             }
+          }
         }
 
         stage('Remove Unused docker image') {
